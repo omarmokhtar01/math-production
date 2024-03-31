@@ -64,21 +64,49 @@ const Login = () => {
     // }, 1000);
 
 
-    useEffect(()=>{
-      if (!isLoading) {
-        if (res&&res.data) {
-          if ( res.message==="User retrieved successfully.") {
-            const expirationTime = 7; // in days
-              const expirationDate = new Date();
-              expirationDate.setDate(expirationDate.getDate() + expirationTime);
-              Cookies.set("token", res.data.token, { expires: expirationDate });
-               setTimeout(() => {
-      navigate("/Questions")
-    }, 1000);
-          }
+    // useEffect(()=>{
+    //   if (!isLoading) {
+    //     if (res&&res.data) {
+    //       if ( res.message==="User retrieved successfully.") {
+    //         const expirationTime = 7; // in days
+    //           const expirationDate = new Date();
+    //           expirationDate.setDate(expirationDate.getDate() + expirationTime);
+    //           Cookies.set("token", res.data.token, { expires: expirationDate });
+    //            setTimeout(() => {
+    //   navigate("/Questions")
+    // }, 1000);
+    //       }
+    //     }
+    //   }
+    // },[isLoading])
+
+
+    useEffect(() => {
+    if (isLoading === false) {
+      if (res) {
+        console.log(res.status);
+
+        if (res.data && res.data.token) {
+          const expirationTime = 30; // in days
+          const expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + expirationTime);
+          Cookies.set("token", res.data.token, { expires: expirationDate });
+        } else {
+          // Remove token and user info if login is not successful
+          Cookies.remove("token");
         }
+        if ( res.message==="تم جلب models/users.singular بنجاح.") {
+         console.log("succ");
+          setTimeout(() => {
+            navigate("/Questions");
+          }, 1500);
+        }
+        
       }
-    },[isLoading])
+    }
+  }, [isLoading]);
+
+
     
 
     const [selectedOption, setSelectedOption] = useState('option1');
