@@ -17,6 +17,7 @@ import profileIcon from "../../images/profile.svg"
 import grayQuestion from "../../images/grayQuestion.svg"
 import { Link, useLocation } from 'react-router-dom';
 import { Accordion, Container, Navbar, Row } from 'react-bootstrap';
+import { BsFillQuestionSquareFill } from "react-icons/bs";
 
 const Sidebar = () => {
   const [clickedItem, setClickedItem] = useState(null);
@@ -178,7 +179,7 @@ const handleClickActive = (link) => {
       color:  '#FFFFFF' 
     }}
   >
-    <img src={clicked ? questionIcon : grayQuestion} style={{ paddingLeft: '4px' }} />
+    <img src= {questionIcon} style={{ paddingLeft: '4px' }} />
     <span className='txtSide'>    الاسئلة</span>
   </Link>
 </li>
