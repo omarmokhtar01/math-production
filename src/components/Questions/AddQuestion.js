@@ -8,8 +8,19 @@ import toast, { Toaster } from 'react-hot-toast';
 import drMath from "../../images/drMath.svg"
 import searchIcon from "../../images/search.svg"
 import notificationIcon from "../../images/notification.svg"
-const AddQuestion = () => {
+import Cookies from "js-cookie";
+import { Link ,useNavigate} from "react-router-dom";
 
+const AddQuestion = () => {
+  let token = Cookies.get("token");
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (!token) {
+      navigate("/login");
+    }
+
+  },[token])
     const dispatch = useDispatch()
     const addOne = useSelector((state) => state.question.createQuestion);
     const isLoading = useSelector((state) => state.question.isLoading);

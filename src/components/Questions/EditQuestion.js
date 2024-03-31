@@ -6,11 +6,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { EditOneQuestion, getTrainingTypes, getTypeCategory, getTypeLevels } from '../../features/questions/questionSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import { useParams } from 'react-router-dom';
+import { Link ,useNavigate} from "react-router-dom";
+
 import drMath from "../../images/drMath.svg"
 import searchIcon from "../../images/search.svg"
 import notificationIcon from "../../images/notification.svg"
+import Cookies from "js-cookie";
 
 const EditQuestion = () => {
+  let token = Cookies.get("token");
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (!token) {
+      navigate("/login");
+    }
+
+  },[token])
 const {idPage}= useParams()
     const dispatch = useDispatch()
     const editOne = useSelector((state) => state.question.editQuestion);

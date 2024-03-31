@@ -8,7 +8,7 @@ import viewIcon from "../../images/view.svg"
 import delIcon from "../../images/delete.svg"
 import attentionIcon from "../../images/attention.svg"
 import './question.css'
-import { Link, useParams } from 'react-router-dom';
+import { Link ,useNavigate} from "react-router-dom";
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { getAllquestions, removeOneQuestion } from '../../features/questions/questionSlice';
@@ -31,12 +31,22 @@ import settingIcon from "../../images/settingIcon.svg"
 import profileIcon from "../../images/profile.svg"
 
 import { Accordion } from 'react-bootstrap';
+import Cookies from "js-cookie";
 
 
 
 
 
 const QuestionsPage = () => {
+  let token = Cookies.get("token");
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (!token) {
+      navigate("/login");
+    }
+
+  },[token])
   // const { id } = useParams();
   const dispatch = useDispatch()
   const getDatQuestion = useSelector((state) => state.question.questionData);
@@ -70,7 +80,6 @@ const QuestionsPage = () => {
 
   // }, [dispatch]);
 console.log(id);
-  const token ="33|x1VvBnDjcHcGrqAjafaXKXSgv9cWtfSWGXxq7mXqc3db5601"
 
 
 

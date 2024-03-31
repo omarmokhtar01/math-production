@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Sidebar from '../Sidebar/Sidebar';
 import { Col, Container, Form, Modal, Nav, Navbar, Row, Table } from 'react-bootstrap';
 import './question.css'
@@ -6,7 +6,19 @@ import downloadIcon from "../../images/download.svg"
 import drMath from "../../images/drMath.svg"
 import searchIcon from "../../images/search.svg"
 import notificationIcon from "../../images/notification.svg"
+import Cookies from "js-cookie";
+import { Link ,useNavigate} from "react-router-dom";
+
 const AddExcelSheet = () => {
+  let token = Cookies.get("token");
+  const navigate = useNavigate();
+
+  useEffect(()=>{
+    if (!token) {
+      navigate("/login");
+    }
+
+  },[token])
     return    <div>
 <div >
 

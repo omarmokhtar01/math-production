@@ -54,6 +54,12 @@ const Login = () => {
       );
 
       if ( res.message==="User retrieved successfully.") {
+        const expirationTime = 30; // in days
+          const expirationDate = new Date();
+          expirationDate.setDate(expirationDate.getDate() + expirationTime);
+          Cookies.set("token", res.data.token, { expires: expirationDate });
+
+          
         setTimeout(() => {
           navigate("/Questions")
         }, 1000);
