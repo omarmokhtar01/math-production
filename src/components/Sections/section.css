@@ -1,0 +1,17 @@
+.css-b62m3t-container {
+    position: relative;
+    box-sizing: border-box;
+    color: rgba(18, 18, 18, 1) !important;
+    text-align: start;
+}
+
+.css-13cymwt-control{
+    border:none  !important;
+    background-color: rgb(245 245 245 / 43%) !important ;
+    border-radius: 8px !important ;
+    padding: 12px !important ;
+
+}
+.accordion-button::after{
+    margin-right: 100px !important;
+}

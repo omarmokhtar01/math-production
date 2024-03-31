@@ -1,0 +1,17 @@
+.custom-input::placeholder {
+    color:rgba(17, 17, 17, 0.25);
+    
+  }
+  
+
+  .custom-radio{
+    accent-color: #d46c0c;
+    margin-top: -10px;
+  }
+
+@media (max-width: 991.98px) { 
+   .meduim-screen{
+  width: 305px !important;
+} }
+
+
