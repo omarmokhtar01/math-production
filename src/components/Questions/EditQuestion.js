@@ -101,8 +101,8 @@ console.log(idPage);
     
     const handleChangeChoices = (e) => {
         // Split the input value by comma to get individual choices
-        const newChoices = e.target.value.split(",");
-        setChoices(newChoices);
+        // const newChoices = .split(",");
+        setChoices(e.target.value);
       };
      
       const [expressionArray, setExpressionArray] = useState([]);
@@ -151,7 +151,41 @@ console.log(idPage);
         type_level_id:idMain,
         level_category_id : idSub
       };
+      if (expressionArray.length <=0) {
+        console.log(expressionArray);
+        return toast.error("حدث خطأ في اضافة السؤال مثال للسؤال 4+5: ")
+        
+      }
+      
+      if (numbersInput.length <=0) {
+        return toast.error("عدد الارقام في السوال مطلوب")
 
+      }
+    
+      if (choices.length <=0) {
+
+        return toast.error("حدث خطأ في اضافة الاختيارات مثال 4,5 ")
+
+      }
+    
+      if (answer.length <=0) {
+        console.error('الاجابة الصحيحة مطلوبة');
+        return; // Prevent further action
+      }
+    
+      if (!id) {
+        return toast.error("نوع السؤال مطلوب")// Prevent further action
+      }
+    
+      if (!idMain) {
+        return toast.error("القسم الرئيسي مطلوب")// Prevent further action
+        // Prevent further action
+      }
+    
+      if (!idSub) {
+        return toast.error("القسم الفرعي مطلوب")// Prevent further action
+        // Prevent further action
+      }
     //   if (answer.length>0) {
     //     toast.error("حدث خطأ في اضافة السؤال مثال للسؤال 4,+5: ")
     //     return; // Prevent further action
@@ -253,7 +287,9 @@ console.log(idPage);
 
 <Container>
 <div>
+  <Link to={'/'}>
 <img src={drMath} alt="Your Logo" />
+</Link>
 </div>
   <Navbar.Brand href="#home">  الاسئله </Navbar.Brand>
   <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -341,7 +377,7 @@ console.log(idPage);
   value={Array.isArray(expressionArray) ? expressionArray.join('') : expressionArray}
   onChange={handleChangeNumbers}
       type="text"
-      placeholder="Enter the expression"
+      placeholder="4+5+9"
       className='custom-input'
       style={{
         borderRadius: '8px',
@@ -506,7 +542,7 @@ console.log(idPage);
                       <button onClick={handleSubmit}
                       style={{padding:'8px 30px', fontSize:'15px', background:'linear-gradient(91deg, #FF7300 0.18%, #FFCD4D 99.68%)' ,color:'#FFFFFF',
                             border:'none' , borderRadius:'7px'}} >
-                          اضافه
+                          تعديل
                         </button>
               </div>   
               

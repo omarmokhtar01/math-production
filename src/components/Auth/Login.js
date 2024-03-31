@@ -53,20 +53,32 @@ const Login = () => {
         })
       );
 
-      if ( res.message==="User retrieved successfully.") {
-        const expirationTime = 30; // in days
-          const expirationDate = new Date();
-          expirationDate.setDate(expirationDate.getDate() + expirationTime);
-          Cookies.set("token", res.data.token, { expires: expirationDate });
-
-          
-        setTimeout(() => {
-          navigate("/Questions")
-        }, 1000);
-        
-      }
+      
       // Handle success or error responses here (redirect or show error message)
     };
+
+
+
+    // setTimeout(() => {
+    //   navigate("/Questions")
+    // }, 1000);
+
+
+    useEffect(()=>{
+      if (!isLoading) {
+        if (res&&res.data) {
+          if ( res.message==="User retrieved successfully.") {
+            const expirationTime = 7; // in days
+              const expirationDate = new Date();
+              expirationDate.setDate(expirationDate.getDate() + expirationTime);
+              Cookies.set("token", res.data.token, { expires: expirationDate });
+               setTimeout(() => {
+      navigate("/Questions")
+    }, 1000);
+          }
+        }
+      }
+    },[isLoading])
     
 
     const [selectedOption, setSelectedOption] = useState('option1');
@@ -82,14 +94,14 @@ const Login = () => {
      <Row style={{maxWidth:'100%'}}>
         <Col  sm={12} xs={12} md={5} xl={6}>
             <div>
-            <img  src={imgForm} alt="" style={{ width:'100%', height: "1024px" }} />
+            <img  src={imgForm} alt="" style={{ width:'100%', height: "1024px" }} className='img-login'/>
             </div>   
         </Col>
        
-        <Col sm={12} xs={12} md={7} xl={6} style={{display:'flex', justifyContent:'center',alignItems:'center', marginTop:'-100px', flexDirection:'column'}}>       
+        <Col  sm={12} xs={12} md={7} xl={6} style={{display:'flex', justifyContent:'center',alignItems:'center', marginTop:'-100px', flexDirection:'column'}}>       
       
-            <p style={{color:'#111' , fontSize:'36px', fontWeight:'700'}}> تسجيل الدخول المشرف</p>
-            <p style={{color:'rgba(17, 17, 17, 0.40)', fontSize:'16px', marginBottom:'25px'}}> مرحبا بك مرة اخري,قم بتسجيل الدخول الي لوحة التحكم الخاصة بك </p>
+            <p className='color-txt' style={{color:'#111' , fontSize:'36px', fontWeight:'700'}}> تسجيل الدخول المشرف</p>
+            <p className='color-txt' style={{color:'rgba(17, 17, 17, 0.40)', fontSize:'16px', marginBottom:'25px'}}> مرحبا بك مرة اخري,قم بتسجيل الدخول الي لوحة التحكم الخاصة بك </p>
             <Form>
                 <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                     <Form.Label style={{display:'flex'}} >بريدك الإلكتروني</Form.Label>

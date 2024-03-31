@@ -14,4 +14,34 @@
   width: 305px !important;
 } }
 
+@media (max-width: 555px) { 
+  .img-login {
+    height: 500px !important;
+    width: 95% !important;
+  }
+  .color-txt {
+    color: white !important;
+  }
+}
+
+@media (min-width: 556px) and (max-width: 575.98px) { 
+  .img-login {
+    height: 500px !important;
+    width: 80% !important;
+  }
+  .color-txt {
+    color: white !important;
+  }
+}
+
+
+@media (min-width: 576px) and (max-width: 767.98px) { 
+  .img-login{
+    height: 500px !important;
+    width: 80% !important;
+  }
+  .color-txt{
+    color: white !important;
+  }
+ }
 

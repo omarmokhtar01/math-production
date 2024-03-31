@@ -159,8 +159,10 @@ console.log(id);
     
       <Container>
       <div>
-      <img src={drMath} alt="Your Logo" />
-      </div>
+  <Link to={'/'}>
+<img src={drMath} alt="Your Logo" />
+</Link>
+</div>
         <Navbar.Brand href="#home">  الاسئله </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav"  className="justify-content-end">
@@ -236,7 +238,7 @@ console.log(id);
         </div> */}
 
  
-   <div style={{paddingRight:'30px', paddingLeft:'30px' , height:'100%'}}>    
+   <div className='responsive-box' style={{paddingRight:'30px', paddingLeft:'30px' , height:'100%'}}>    
    {/* <Navbar className='navbar-card' expand="lg" dir="ltr" style={{backgroundColor:'white'}}>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav" style={{marginLeft:'16px'}}>

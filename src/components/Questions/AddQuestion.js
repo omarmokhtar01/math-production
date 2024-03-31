@@ -99,10 +99,10 @@ const AddQuestion = () => {
     };
     
     const handleChangeChoices = (e) => {
-        // Split the input value by comma to get individual choices
-        const newChoices = e.target.value.split(",");
-        setChoices(newChoices);
-      };
+      // Split the input value by comma to get individual choices
+      // const newChoices = .split(",");
+      setChoices(e.target.value);
+    };
      
       const [expressionArray, setExpressionArray] = useState([]);
 
@@ -153,35 +153,41 @@ const AddQuestion = () => {
         level_category_id : idSub
       };
 
-    //   if (answer.length>0) {
-    //     toast.error("حدث خطأ في اضافة السؤال مثال للسؤال 4,+5: ")
-    //     return; // Prevent further action
-    //   }
+      if (expressionArray.length <=0) {
+        console.log(expressionArray);
+        return toast.error("حدث خطأ في اضافة السؤال مثال للسؤال 4+5: ")
+        
+      }
+      
+      if (numbersInput.length <=0) {
+        return toast.error("عدد الارقام في السوال مطلوب")
+
+      }
     
-    //   if (!choices) {
-    //     console.error('Choices are required.');
-    //     return; // Prevent further action
-    //   }
+      if (choices.length <=0) {
+
+        return toast.error("حدث خطأ في اضافة الاختيارات مثال 4,5 ")
+
+      }
     
-    //   if (!numbers) {
-    //     console.error('Numbers are required.');
-    //     return; // Prevent further action
-    //   }
+      if (answer.length <=0) {
+        console.error('الاجابة الصحيحة مطلوبة');
+        return; // Prevent further action
+      }
     
-    //   if (!id) {
-    //     console.error('ID is required.');
-    //     return; // Prevent further action
-    //   }
+      if (!id) {
+        return toast.error("نوع السؤال مطلوب")// Prevent further action
+      }
     
-    //   if (!idMain) {
-    //     console.error('Main ID is required.');
-    //     return; // Prevent further action
-    //   }
+      if (!idMain) {
+        return toast.error("القسم الرئيسي مطلوب")// Prevent further action
+        // Prevent further action
+      }
     
-    //   if (!idSub) {
-    //     console.error('Sub ID is required.');
-    //     return; // Prevent further action
-    //   }
+      if (!idSub) {
+        return toast.error("القسم الفرعي مطلوب")// Prevent further action
+        // Prevent further action
+      }
       dispatch(createOneQuestion( formData ));
 
   if (addOne && addOne.status === 200) {
@@ -252,7 +258,9 @@ const AddQuestion = () => {
 
 <Container>
 <div>
+  <Link to={'/'}>
 <img src={drMath} alt="Your Logo" />
+</Link>
 </div>
   <Navbar.Brand href="#home">  الاسئله </Navbar.Brand>
   <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -340,7 +348,7 @@ const AddQuestion = () => {
   value={Array.isArray(expressionArray) ? expressionArray.join('') : expressionArray}
   onChange={handleChangeNumbers}
       type="text"
-      placeholder="Enter the expression"
+      placeholder="4+5+7"
       className='custom-input'
       style={{
         borderRadius: '8px',
