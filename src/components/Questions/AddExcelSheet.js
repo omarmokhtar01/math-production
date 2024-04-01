@@ -11,6 +11,8 @@ import { Link ,useNavigate} from "react-router-dom";
 import * as XLSX from 'xlsx'; // Import all functions/objects from xlsx library
 import { createOneQuestion } from '../../features/questions/questionSlice';
 import { useSelector, useDispatch } from 'react-redux';
+import { createLevelCategory, createTrainningType, createTypeLevel } from '../../features/excelSlice/excelSlice';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AddExcelSheet = () => {
   let token = Cookies.get("token");
@@ -23,140 +25,255 @@ const AddExcelSheet = () => {
 
   },[token])
 
+  
+
+  const trainTypeData = useSelector((state) => state.excel.trainTypeData);
+  const [title, setTitle] = useState('');
+
+  const handleSubmittrainTypeData =async (e) => {
+    e.preventDefault();
+    const actionResult = await dispatch(createTrainningType({ title }));
+
+    // Check if the action was successful
+    if (createTrainningType.fulfilled.match(actionResult)) {
+      // Access the id from the response data
+      const trainTypeId = actionResult.payload.data.id;
+      localStorage.setItem('trainTypeId', trainTypeId);
+    }    
+   
+  };
+
+  const typeLevelData = useSelector((state) => state.excel.typeLevelData);
+
+  const handleSubmittraintypeLevelData =async (e) => {
+    e.preventDefault();
+    const actionResult =await dispatch(createTypeLevel({ title,training_type_id:localStorage.getItem('trainTypeId') }));
+    const trainTypeId = actionResult.payload.data.id;
+      localStorage.setItem('typeLevelId', trainTypeId);
+  };
+
+
+  const levelCategoryData = useSelector((state) => state.excel.levelCategoryData);
+  const handleSubmittrainLevelCategory =async (e) => {
+    e.preventDefault();
+    const actionResult =await dispatch(createLevelCategory({ title,type_level_id:localStorage.getItem('trainTypeId') }));
+    const trainTypeId = actionResult.payload.data.id;
+      localStorage.setItem('levelCategoryId', trainTypeId);
+  };
+
+  const isLoadingExcel = useSelector((state) => state.excel.isLoading);
 
 
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [excelData, setExcelData] = useState([]);
-
+  const [excelData, setExcelData] = useState(null);
   const handleFileChange = (event) => {
-      // Get the selected file from the input
-      const file = event.target.files[0];
-      setSelectedFile(file);
-  };
+    // Get the selected file from the input
+    const file = event.target.files[0];
+    setSelectedFile(file);
+};
 
-  const handleUpload = () => {
-      if (!selectedFile) {
-          alert('Please select a file to upload.');
-          return;
-      }
+const handleUpload = (e) => {
+  e.preventDefault();
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-          const binaryString = event.target.result;
-          const workbook = XLSX.read(binaryString, { type: 'binary' });
-          const sheetName = workbook.SheetNames[0]; // Assuming data is in the first sheet
-          const worksheet = workbook.Sheets[sheetName];
-          const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-          setExcelData(data);
-      };
-      reader.readAsBinaryString(selectedFile);
+  if (!selectedFile) {
+    return toast.error("من فضلك قم بأضافة ملف Excel")
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const binaryString = event.target.result;
+    setExcelData(binaryString); // Set the binary string data here
   };
+  reader.readAsBinaryString(selectedFile);
+  try {
+    if (typeof excelData !== 'string') {
+return toast.error("من فضلك قم بأضافة ملف Excel")
+      // throw new Error('Excel data is not a string');
+    }
+
+
+    // Proceed with processing questionsData or any other logic
+  } catch (error) {
+    console.error('Error processing Excel data:', error);
+    // Handle or display the error as needed
+  }
+  const workbook = XLSX.read(excelData, { type: 'binary' });
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const headers = data[0];
+  const questionsData = data.slice(1);
+
+  toast.success("يتم التحميل الأن")
+
+  // console.log(workbook);
+  // console.log(worksheet);
+  // console.log(data);
+console.log(headers);
+  questionsData.forEach(async(questionData) => {
+//     const actionTrainType =  dispatch(createTrainningType({ 
+//       title: questionData[headers.indexOf("نوع السؤال (تفصيلي - عام )")] 
+//     }));
+// console.log(actionTrainType);
+const headerText = "نوع السؤال (تفصيلي - عام )";
+const headerIndex = headers.indexOf(headerText);
+
+
+const actionTrainType = await dispatch(createTrainningType({
+  title: questionData[headers.indexOf(headerText)]
+}));
+
+if (!actionTrainType.payload || !actionTrainType.payload.data || !actionTrainType.payload.data.id) {
+  console.log('Invalid actionTrainType data');
+  return; // Exit or handle the error appropriately
+}
+
+const typelevelId = await dispatch(createTypeLevel({  
+  title: questionData[headers.indexOf("القسم الرئيسي")] || questionData[headers.indexOf("المستوي ")],
+  training_type_id: actionTrainType.payload.data.id
+}));
+
+if (!typelevelId.payload || !typelevelId.payload.data || !typelevelId.payload.data.id) {
+  console.log('Invalid typelevelId data');
+  return; // Exit or handle the error appropriately
+}
+
+    const levelCategoryId = await dispatch(createLevelCategory({ title: questionData[headers.indexOf("القسم الفرعي")],type_level_id: typelevelId.payload.data.id }))
+
+    if (!levelCategoryId.payload || !levelCategoryId.payload.data || !levelCategoryId.payload.data.id) {
+      console.log('Invalid levelCategoryId data');
+      return; // Exit or handle the error appropriately
+
+    }
+
+const formData = {
+      answer: questionData[headers.indexOf("الاجابة")],
+      choices: questionData[headers.indexOf("الاختيارات")],
+      numbers: [
+        questionData[headers.indexOf("الرقم الاول")],
+        questionData[headers.indexOf("الرقم الثاني")],
+        questionData[headers.indexOf("الرقم الثالث")],
+        questionData[headers.indexOf("الرقم الرابع")],
+        questionData[headers.indexOf("الرقم الخامس")],
+        questionData[headers.indexOf("الرقم السادس")],
+        questionData[headers.indexOf("الرقم السابع")],
+        questionData[headers.indexOf("الرقم الثامن")],
+        questionData[headers.indexOf("الرقم التاسع")],
+        questionData[headers.indexOf("الرقم العاشر")],
+      ],
+      training_type_id: actionTrainType.payload.data.id,
+      type_level_id: typelevelId.payload.data.id,
+      level_category_id: levelCategoryId.payload.data.id,
+    };
+
+  await  dispatch(createOneQuestion(formData));
+  });
+};
+
 
   const addOne = useSelector((state) => state.question.createQuestion);
   const isLoading = useSelector((state) => state.question.isLoading);
 
-console.log(addOne);
 const dispatch = useDispatch()
 
-const handleAddQuestions = async () => {
 
-      const data = [
-          [
-              "التسلسل",
-              "الرقم الاول",
-              "الرقم الثاني",
-              "الرقم الثالث",
-              "الرقم الرابع",
-              "الرقم الخامس",
-              "الرقم السادس",
-              "الرقم السابع",
-              "الرقم الثامن",
-              "الرقم التاسع",
-              "الرقم العاشر",
-              "نوع السؤال (تفصيلي - عام )",
-              "المستوي ",
-              "القسم الرئيسي",
-              "القسم الفرعي",
-              "عدد الارقام",
-              "الاجابة",
-              "الاختيارات"
-          ],
-          [
-              1,
-              5,
-              -10,
-              "*8",
-              "/7",
-              -3,
-              9,
-              -100,
-              200,
-              null,
-              null,
-              "تفصيلي",
-              "الاول",
-              null,
-              "مسائل منفصلة",
-              8,
-              10,
-              "10,20"
-          ],
-          [
-              2,
-              100,
-              "*10",
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
-              "عام",
-              null,
-              "الضرب",
-              "من 1 ل 9",
-              2,
-              5,
-              "5,15"
-          ],
-          [
-              3
-          ],
-          [],
-          [],
-          []
-      ];
+const handleAddQuestions = async (e) => {
+  e.preventDefault();
 
-      // Assuming excelData contains the data you want to add to the API
-      for (let i = 1; i < data.length; i++) {
-          const rowData = data[i];
-          const formData = {
-              first_number: rowData[1],
-              second_number: rowData[2],
-              third_number: rowData[3],
-              fourth_number: rowData[4],
-              fifth_number: rowData[5],
-              sixth_number: rowData[6],
-              seventh_number: rowData[7],
-              eighth_number: rowData[8],
-              ninth_number: rowData[9],
-              tenth_number: rowData[10],
-              question_type: rowData[11],
-              level: rowData[12],
-              main_section: rowData[13],
-              sub_section: rowData[14],
-              number_count: rowData[15],
-              answer: rowData[16],
-              choices: rowData[17]
-          };
-          await dispatch( createOneQuestion(formData)); // Assuming createOneQuestion is a function to make API request
-      }
- 
-   
-  
+  // Fetch training_type_id and store it in localStorage
+  // if (createTrainningType.fulfilled.match(actionTrainType)) {
+  //   const trainTypeId = actionTrainType.payload.data.id;
+  //   localStorage.setItem('trainTypeId', trainTypeId);
+  // }
+
+  // Fetch type_level_id using training_type_id from localStorage
+  // const actionTypeLevel = await dispatch(createTypeLevel({ title, training_type_id: localStorage.getItem('trainTypeId') }));
+  // const typeLevelId = actionTypeLevel.payload.data.id;
+
+  // // Fetch level_category_id using type_level_id from localStorage
+  // const actionLevelCategory = await dispatch(createLevelCategory({ title, type_level_id: typeLevelId }));
+  // const levelCategoryId = actionLevelCategory.payload.data.id;
+  try {
+    if (typeof excelData !== 'string') {
+      throw new Error('Excel data is not a string');
+    }
+
+
+    // Proceed with processing questionsData or any other logic
+  } catch (error) {
+    console.error('Error processing Excel data:', error);
+    // Handle or display the error as needed
+  }
+  const workbook = XLSX.read(excelData, { type: 'binary' });
+  const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const headers = data[0];
+  const questionsData = data.slice(1);
+
+
+  // console.log(workbook);
+  // console.log(worksheet);
+  // console.log(data);
+console.log(headers);
+  questionsData.forEach(async(questionData) => {
+//     const actionTrainType =  dispatch(createTrainningType({ 
+//       title: questionData[headers.indexOf("نوع السؤال (تفصيلي - عام )")] 
+//     }));
+// console.log(actionTrainType);
+const headerText = "نوع السؤال (تفصيلي - عام )";
+const headerIndex = headers.indexOf(headerText);
+
+
+const actionTrainType = await dispatch(createTrainningType({
+  title: questionData[headers.indexOf(headerText)]
+}));
+
+if (!actionTrainType.payload || !actionTrainType.payload.data || !actionTrainType.payload.data.id) {
+  console.log('Invalid actionTrainType data');
+  return; // Exit or handle the error appropriately
+}
+
+const typelevelId = await dispatch(createTypeLevel({  
+  title: questionData[headers.indexOf("القسم الرئيسي")] || questionData[headers.indexOf("المستوي ")],
+  training_type_id: actionTrainType.payload.data.id
+}));
+
+if (!typelevelId.payload || !typelevelId.payload.data || !typelevelId.payload.data.id) {
+  console.log('Invalid typelevelId data');
+  return; // Exit or handle the error appropriately
+}
+
+    const levelCategoryId = await dispatch(createLevelCategory({ title: questionData[headers.indexOf("القسم الفرعي")],type_level_id: typelevelId.payload.data.id }))
+
+    if (!levelCategoryId.payload || !levelCategoryId.payload.data || !levelCategoryId.payload.data.id) {
+      console.log('Invalid levelCategoryId data');
+      return; // Exit or handle the error appropriately
+
+    }
+
+const formData = {
+      answer: questionData[headers.indexOf("الاجابة")],
+      choices: questionData[headers.indexOf("الاختيارات")],
+      numbers: [
+        questionData[headers.indexOf("الرقم الاول")],
+        questionData[headers.indexOf("الرقم الثاني")],
+        questionData[headers.indexOf("الرقم الثالث")],
+        questionData[headers.indexOf("الرقم الرابع")],
+        questionData[headers.indexOf("الرقم الخامس")],
+        questionData[headers.indexOf("الرقم السادس")],
+        questionData[headers.indexOf("الرقم السابع")],
+        questionData[headers.indexOf("الرقم الثامن")],
+        questionData[headers.indexOf("الرقم التاسع")],
+        questionData[headers.indexOf("الرقم العاشر")],
+      ],
+      training_type_id: actionTrainType.payload.data.id,
+      type_level_id: typelevelId.payload.data.id,
+      level_category_id: levelCategoryId.payload.data.id,
+    };
+
+  await  dispatch(createOneQuestion(formData));
+  });
 };
 
 
@@ -313,18 +430,16 @@ const handleAddQuestions = async () => {
                 <button onClick={handleUpload} style={{ borderRadius:'10px', color:'#FFFFFF', padding:'8px', fontSize:'18px', border:'none', background:'linear-gradient(91deg, #FF7300 0.18%, #FFCD4D 99.68%)', width:'30%' }}>
                     اضافه
                 </button>
-{/*
-                <button onClick={handleAddQuestions} disabled={excelData.length === 0 || isLoading} style={{ marginTop: '20px', borderRadius:'10px', color:'#FFFFFF', padding:'8px', fontSize:'18px', border:'none', background:'linear-gradient(91deg, #FF7300 0.18%, #FFCD4D 99.68%)', width:'30%' }}>
-                    {isLoading ? 'Adding...' : 'Add Questions'}
-                </button>
-                 */}
             </div>
 
+            {/* <button onClick={handleAddQuestions}>اضافة الاسئلة</button> */}
         </div>
+
 </div>
         </Col>
     
-     
+        <Toaster />
+
     </Row>
 
     </div>

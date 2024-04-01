@@ -407,7 +407,7 @@ console.log(id);
                 <tbody>
           <tr>
             <td>{item.id}</td>
-            <td>( {item.numbers.map(num => num.toString())} ) </td>
+            <td>( {item.numbers.map(num => num)} ) </td>
             <td> {item.training_type.title} </td>
             <td> {item.type_level.title}</td>
             <td>{item.level_category.title}</td>
