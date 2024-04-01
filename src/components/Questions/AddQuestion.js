@@ -485,7 +485,7 @@ const AddQuestion = () => {
         value={numbersInput}
         onChange={(e) => handleChangeNumbersCount(e)}
         type="text"
-        placeholder="مثال لأضافة الارقام (5, +4, +2, -1,*2,/1)"
+        placeholder="مثال عدد ارقام السؤال 3"
         className='custom-input'
         style={{
           borderRadius: '8px',
