@@ -126,7 +126,7 @@ const initialState = {
           return error
         }
       });
-
+ 
 
       const getTypeCategory = createAsyncThunk('get/level-cat', async (_, thunkAPI) => {
         try {
